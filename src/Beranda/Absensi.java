@@ -12,8 +12,8 @@ import Loginreg.*;
  */
 public class Absensi extends javax.swing.JPanel {
 
-    private final Main main;
-    public Absensi(Main main) {
+    private final Dashboard main;
+    public Absensi(Dashboard main) {
         initComponents();
         this.main = main;
     }

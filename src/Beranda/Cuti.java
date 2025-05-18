@@ -10,8 +10,8 @@ package Beranda;
  */
 public class Cuti extends javax.swing.JPanel {
 
-    private final Main main;
-    public Cuti(Main main) {
+    private final Dashboard main;
+    public Cuti(Dashboard main) {
         initComponents();
         this.main = main;
     }

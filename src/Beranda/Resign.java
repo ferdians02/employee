@@ -12,8 +12,8 @@ import Loginreg.*;
  */
 public class Resign extends javax.swing.JPanel {
 
-    private final Main main;
-    public Resign(Main main) {
+    private final Dashboard main;
+    public Resign(Dashboard main) {
         initComponents();
         this.main = main;
     }

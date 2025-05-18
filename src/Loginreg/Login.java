@@ -4,12 +4,20 @@
  */
 package Loginreg;
 
+import Beranda.Dashboard;
+import Connect.ConnectDB;
+import com.mysql.jdbc.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Dell
  */
 public class Login extends javax.swing.JPanel {
 
+    private Connection conn = (Connection) new ConnectDB().connect();
     private final Main main;
     public Login(Main main) {
         initComponents();
@@ -27,9 +35,9 @@ public class Login extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        mail = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jPasswordField1 = new javax.swing.JPasswordField();
+        pw = new javax.swing.JPasswordField();
         jButton1 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(30, 30, 30));
@@ -41,14 +49,14 @@ public class Login extends javax.swing.JPanel {
         jLabel2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel2.setText("Email");
 
-        jTextField1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jTextField1.setPreferredSize(new java.awt.Dimension(64, 50));
+        mail.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        mail.setPreferredSize(new java.awt.Dimension(64, 50));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel3.setText("Password");
 
-        jPasswordField1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jPasswordField1.setPreferredSize(new java.awt.Dimension(64, 50));
+        pw.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        pw.setPreferredSize(new java.awt.Dimension(64, 50));
 
         jButton1.setBackground(new java.awt.Color(204, 102, 0));
         jButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
@@ -71,9 +79,9 @@ public class Login extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(mail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pw, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(157, Short.MAX_VALUE))
         );
@@ -85,11 +93,11 @@ public class Login extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pw, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(349, Short.MAX_VALUE))
@@ -98,6 +106,40 @@ public class Login extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        
+        
+        String email = mail.getText();
+        String pass = pw.getText();
+        
+        if (email.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Email Tidak Boleh Kosong");
+        }
+        
+        if (pass.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Password Tidak Boleh Kosong");
+        }else if (pass.length()>8) {
+            JOptionPane.showMessageDialog(null, "Panjang Tidak Boleh lebih dari 8");
+        }
+         
+        String sql ="SELECT * FROM  tb_user WHERE username = '"+ email +"'AND password='"+ pass +"'";
+      
+        System.out.println("ini sql : " + sql);
+        try{ 
+            Statement s = conn.createStatement();
+            ResultSet rs = s.executeQuery(sql);
+            System.out.println("ini result set : " + rs);
+            if(rs.next()){
+                Dashboard d = new Dashboard();
+                d.setVisible(true);
+                
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Tidak Berhasil Login");
+//                kosong();
+            }   
+        }catch (Exception e) {
+               
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
@@ -106,7 +148,7 @@ public class Login extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField mail;
+    private javax.swing.JPasswordField pw;
     // End of variables declaration//GEN-END:variables
 }

@@ -6,7 +6,7 @@ import java.awt.Color;
 import javax.swing.SwingUtilities;
 
 
-public class Main extends javax.swing.JFrame {
+public class Dashboard extends javax.swing.JFrame {
 
    private Absensi absen;
    private Lembur lembur;
@@ -88,7 +88,7 @@ public class Main extends javax.swing.JFrame {
         jPanel2.add(cari);
         SwingUtilities.updateComponentTreeUI(jPanel2);
    }
-    public Main() {
+    public Dashboard() {
         initComponents();
         setAbsensi();
     }
@@ -425,7 +425,7 @@ public class Main extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Main().setVisible(true);
+                new Dashboard().setVisible(true);
             }
         });
     }

@@ -7,8 +7,8 @@ package Beranda;
  */
 public class Tambah extends javax.swing.JPanel {
     
-    private final Main main;
-    public Tambah(Main main) {
+    private final Dashboard main;
+    public Tambah(Dashboard main) {
         initComponents();
         this.main = main;
     }

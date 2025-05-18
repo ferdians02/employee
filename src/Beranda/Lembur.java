@@ -12,8 +12,8 @@ import Loginreg.*;
  */
 public class Lembur extends javax.swing.JPanel {
 
-    private final Main main;
-    public Lembur(Main main) {
+    private final Dashboard main;
+    public Lembur(Dashboard main) {
         initComponents();
         this.main = main;
     }

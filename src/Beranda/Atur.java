@@ -7,8 +7,8 @@ package Beranda;
  */
 public class Atur extends javax.swing.JPanel {
     
-    private final Main main;
-    public Atur(Main main) {
+    private final Dashboard main;
+    public Atur(Dashboard main) {
         initComponents();
         this.main = main;
     }

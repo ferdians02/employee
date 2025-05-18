@@ -12,8 +12,8 @@ import Loginreg.*;
  */
 public class Gaji extends javax.swing.JPanel {
 
-    private final Main main;
-    public Gaji(Main main) {
+    private final Dashboard main;
+    public Gaji(Dashboard main) {
         initComponents();
         this.main = main;
     }

@@ -4,6 +4,14 @@
  */
 package Beranda;
 
+import Connect.ConnectDB;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
@@ -11,8 +19,10 @@ package Beranda;
  */
 public class Cari extends javax.swing.JPanel {
 
-    private final Main main;
-    public Cari(Main main) {
+     private Connection conn = (Connection) new ConnectDB().connect();
+     
+    private final Dashboard main;
+    public Cari(Dashboard main) {
         initComponents();
         this.main = main;
     }
@@ -27,14 +37,14 @@ public class Cari extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        nikKar = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
+        namaKar = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        selectType = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        allTable = new javax.swing.JTable();
 
         setBackground(new java.awt.Color(30, 30, 30));
 
@@ -45,8 +55,8 @@ public class Cari extends javax.swing.JPanel {
         jLabel2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel2.setText("Nomor Induk Karyawan");
 
-        jTextField1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jTextField1.setPreferredSize(new java.awt.Dimension(64, 50));
+        nikKar.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        nikKar.setPreferredSize(new java.awt.Dimension(64, 50));
 
         jButton1.setBackground(new java.awt.Color(204, 102, 0));
         jButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
@@ -60,11 +70,11 @@ public class Cari extends javax.swing.JPanel {
             }
         });
 
-        jTextField2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jTextField2.setPreferredSize(new java.awt.Dimension(64, 50));
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        namaKar.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        namaKar.setPreferredSize(new java.awt.Dimension(64, 50));
+        namaKar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                namaKarActionPerformed(evt);
             }
         });
 
@@ -74,10 +84,10 @@ public class Cari extends javax.swing.JPanel {
         jLabel6.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel6.setText("Cari Untuk :");
 
-        jComboBox1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Absensi", "Cuti", "Gaji", "Lembur", "Resign" }));
+        selectType.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        selectType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Absensi", "Cuti", "Gaji", "Lembur", "Resign" }));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        allTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -88,7 +98,7 @@ public class Cari extends javax.swing.JPanel {
                 "Nomor Induk Karyawan", "Nama Karyawan", "Divisi", "Jabatan"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(allTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -106,10 +116,10 @@ public class Cari extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(nikKar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(namaKar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(selectType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,15 +139,15 @@ public class Cari extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(nikKar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(namaKar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(selectType, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -147,24 +157,100 @@ public class Cari extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here: /* 
+        
+        
+        /*    Absensi
+            Cuti
+            Gaji
+            Lembur
+            Resign
+        */
+        
+        String selected = (String) selectType.getSelectedItem().toString();
+        System.out.println("Ini Data : " + selected);
+        
+        switch(selected){
+            case "Absensi":
+                absenData();
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    
+    private void absenData(){
+        
+        //        ADD COLUMN TABLE MODEL
+        DefaultTableModel model = new DefaultTableModel();
+        
+        model.addColumn("NIK");
+        model.addColumn("NAMA");
+        model.addColumn("STATUS");
+        model.addColumn("KETENTUAN");   
+        allTable.setModel(model);
+                
+        String nik = nikKar.getText();
+        String nama = namaKar.getText();
+          
+        String sql = """
+                        SELECT 
+                            TK.NIK, 
+                            TK.NAMA_KARYAWAN, TK.STATUS_KEHADIRAN, TK.KETERANGAN FROM TB_ABSEN TA
+                        INNER JOIN TB_KARYAWAN  TK ON TA.ID_KARYAWAN = TK.ID_KARYAWAN
+                        WHERE (TK.NIK IS NULL OR TK.NIK ='' OR UPPER(TK.ID_KARYAWAN) LIKE UPPER ('%' || ? || '%')) 
+                        AND  (TK.NAMA_KARYAWAN IS NULL OR TK.NAMA_KARYAWAN = '' OR UPPER(TK.NAMA_KARYAWAN) LIKE UPPER ('%' || ? || '%'))
+                        AND TA.STATUS_KEHADIRAN = ?
+                     """;
+        try{  
+            PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+            ps.setString(1, nik);
+            ps.setString(2, nama);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()){
+                Object[] row = {
+                    rs.getString("NIK"),
+                    rs.getString("NAMA"),
+                    rs.getString("STATUS"),
+                    rs.getString("KETERANGAN"),
+                };
+//                ADD ROW TABLE MODEL
+//                model.addRow(row);
+            }
+            rs.close();
+            conn.close();
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "koneksi Gagal");
+        }
+    }
+    
+    
+    private void cutiData(){
+         String sql = """
+                        SELECT TK.NIK, TK.NAMA_KARYAWAN, TC.TANGGAL, TC.LAMA_CUTI FROM TB_CUTI TC
+                        INNER JOIN TB_KARYAWAN  TK ON TC.ID_KARYAWAN = TK.ID_KARYAWAN
+                        WHERE (TK.NIK IS NULL OR TK.NIK ='' OR UPPER(TK.ID_KARYAWAN) LIKE UPPER ('%' || ? || '%')) 
+                        AND  (TK.NAMA_KARYAWAN IS NULL OR TK.NAMA_KARYAWAN = '' OR UPPER(TK.NAMA_KARYAWAN) LIKE UPPER ('%' || ? || '%'))
+                     """;
+         
+    }
+    
+   
+    private void namaKarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_namaKarActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_namaKarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable allTable;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField namaKar;
+    private javax.swing.JTextField nikKar;
+    private javax.swing.JComboBox<String> selectType;
     // End of variables declaration//GEN-END:variables
 }
