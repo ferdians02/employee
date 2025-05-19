@@ -2,22 +2,33 @@ package Beranda;
 
 import Connect.ConnectDB;
 import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import javax.swing.JOptionPane;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Date;
 
+import constant.Constants;
+ 
+
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author rakha
  */
 public class Tambah extends javax.swing.JPanel {
-    
+
     private Connection conn = (Connection) new ConnectDB().connect();
-    
+
     private final Dashboard main;
+    private String namaKaryawan, nik, nohp, divisi, namaJabatan, jk, alamat;
+
     public Tambah(Dashboard main) {
         initComponents();
         this.main = main;
+        comboDivBox();
+        comboJabatanBox();
+        comboJenisKelaminBox();
+
     }
 
     /**
@@ -40,7 +51,7 @@ public class Tambah extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         namaKar = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        divs = new javax.swing.JComboBox<>();
+        divsi = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
         jbtn = new javax.swing.JComboBox<>();
         jLabel7 = new javax.swing.JLabel();
@@ -51,7 +62,7 @@ public class Tambah extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         almt = new javax.swing.JTextArea();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        addKaryawan = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
 
@@ -106,9 +117,9 @@ public class Tambah extends javax.swing.JPanel {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Id Karyawan :");
+        jLabel5.setText("NIK");
 
-        divs.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        divsi.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pilih" }));
 
         jLabel6.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -152,15 +163,15 @@ public class Tambah extends javax.swing.JPanel {
             }
         });
 
-        jButton5.setBackground(new java.awt.Color(204, 102, 0));
-        jButton5.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("tambah");
-        jButton5.setBorderPainted(false);
-        jButton5.setPreferredSize(new java.awt.Dimension(0, 50));
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        addKaryawan.setBackground(new java.awt.Color(204, 102, 0));
+        addKaryawan.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        addKaryawan.setForeground(new java.awt.Color(255, 255, 255));
+        addKaryawan.setText("tambah");
+        addKaryawan.setBorderPainted(false);
+        addKaryawan.setPreferredSize(new java.awt.Dimension(0, 50));
+        addKaryawan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                addKaryawanActionPerformed(evt);
             }
         });
 
@@ -225,14 +236,14 @@ public class Tambah extends javax.swing.JPanel {
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
-                                    .addComponent(divs, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(divsi, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel6))
                                 .addComponent(jbtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jLabel9)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(addKaryawan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(10, 10, 10)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -257,7 +268,7 @@ public class Tambah extends javax.swing.JPanel {
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(divs, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(divsi, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(nikKar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -282,7 +293,7 @@ public class Tambah extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(addKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -307,21 +318,118 @@ public class Tambah extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-          String sql = """
-                        INSERT INTO TB_KARYAWAN(ID_JABATAN, NAMA_KARYAWAN, DIVISI, JENIS_KELAMIN, NIK, NOTLP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
+    private void addKaryawanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addKaryawanActionPerformed
+
+        nik = nikKar.getText();
+        namaKaryawan = namaKar.getText();
+        nohp = no.getText();
+        alamat = almt.getText();
+        divisi = divsi.getSelectedItem().toString();
+        namaJabatan = jbtn.getSelectedItem().toString();
+        jk = jenis.getSelectedItem().toString();
+
+        String sql = """
+                        INSERT INTO TB_KARYAWAN(ID_JABATAN, NAMA_KARYAWAN, DIVISI, JENIS_KELAMIN, NIK, NOTELP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
                        VALUES(?,?,?,?,?,?,?,?,?,?)
                        """;
-          
-          try{
-              PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
-              ps.setString(1, jbtn.getSelectedItem().toString());
-          }catch(Exception e){
-              JOptionPane.showMessageDialog(null, "Tidak terhubung");
-          }
-        
-    }//GEN-LAST:event_jButton5ActionPerformed
 
+        try {
+            PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+            ps.setInt(1, findJabatanName(namaJabatan));
+            ps.setString(2, namaKaryawan);
+            ps.setString(3, divisi);
+            ps.setString(4, jk);
+            ps.setString(5, nik);
+            ps.setString(6, nohp);
+            ps.setString(7, alamat);
+            ps.setString(8, "Admin");
+            
+            java.util.Date utilDate = new java.util.Date();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            ps.setDate(9,  sqlDate);
+            ps.setString(10, Constants.RECORD_FLAG_N);
+
+            ps.executeUpdate();
+            
+            JOptionPane.showConfirmDialog(null, "Data berhasil di buat");
+            
+            clear();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Tidak terhubung" + e.getMessage());
+        }
+
+    }//GEN-LAST:event_addKaryawanActionPerformed
+
+    private void clear(){
+        nik = "";
+        namaKaryawan = "";
+        nohp = "";
+        alamat = "";
+        divisi = "";
+        namaJabatan = "";
+        jk = "";
+    }
+ 
+//    COMBO BOX
+    private String comboDivBox() {
+        divsi.addItem("IT");
+        divsi.addItem("QA");
+        divsi.addItem("ADMINISTRASI");
+        divsi.addItem("KEUANGAN");
+        divsi.addItem("GUDANG");
+
+        String val = divsi.getSelectedItem().toString();
+
+        return val;
+    }
+    
+     private String comboJenisKelaminBox() {
+         jenis.removeAllItems();
+        jenis.addItem("Laki - laki");
+        jenis.addItem("Perempuan");
+       
+        String val = jenis.getSelectedItem().toString();
+
+        return val;
+    }
+    
+    
+
+    private void comboJabatanBox() {
+        try {
+            String sql = "SELECT NAMA_JABATAN FROM TB_JABATAN";
+            PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                jbtn.removeAllItems();
+                jbtn.addItem("Pilih");
+                jbtn.addItem(rs.getString("NAMA_JABATAN"));
+            }
+
+//            conn.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
+        }
+    }
+
+//    FIND DATA
+    private Integer findJabatanName(String valJbtn) {
+        Integer find = null;
+        try {
+            String sql = "SELECT ID_JABATAN FROM TB_JABATAN WHERE NAMA_JABATAN = ?";
+            PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+            ps.setString(1, valJbtn);
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()){
+                find = rs.getInt("ID_JABATAN");
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
+        }
+        return find;
+    }
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton6ActionPerformed
@@ -332,11 +440,11 @@ public class Tambah extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addKaryawan;
     private javax.swing.JTextArea almt;
-    private javax.swing.JComboBox<String> divs;
+    private javax.swing.JComboBox<String> divsi;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
