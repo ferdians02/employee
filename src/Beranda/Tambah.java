@@ -228,9 +228,14 @@ public class Tambah extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(namaKar)
                             .addComponent(nikKar)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel7))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel7)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(jLabel4)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8)
@@ -272,9 +277,9 @@ public class Tambah extends javax.swing.JPanel {
                     .addComponent(divsi, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(nikKar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel3))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(namaKar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -315,7 +320,7 @@ public class Tambah extends javax.swing.JPanel {
         model.addColumn("JABATAN");
 
         String sql = """
-                        SELECT k.nik, k.nama_karyawan, k.notelp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
+                        SELECT k.nik, k.nama_karyawan, k.notlp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
                         INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
                         WHERE  upper(k.nama_karyawan) like upper(?)
                      
@@ -335,7 +340,7 @@ public class Tambah extends javax.swing.JPanel {
                 model.addRow(new Object[]{
                     rs.getString("nik"),
                     rs.getString("nama_karyawan"),
-                    rs.getString("notelp"),
+                    rs.getString("notlp"),
                     rs.getString("alamat"),
                     rs.getString("jenis_kelamin"),
                     rs.getString("divisi"),
@@ -372,7 +377,7 @@ public class Tambah extends javax.swing.JPanel {
         jk = jenis.getSelectedItem().toString();
 
         String sql = """
-                        INSERT INTO TB_KARYAWAN(ID_JABATAN, NAMA_KARYAWAN, DIVISI, JENIS_KELAMIN, NIK, NOTELP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
+                        INSERT INTO TB_KARYAWAN(ID_JABATAN, NAMA_KARYAWAN, DIVISI, JENIS_KELAMIN, NIK, NOTLP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
                        VALUES(?,?,?,?,?,?,?,?,?,?)
                        """;
 
@@ -419,7 +424,7 @@ public class Tambah extends javax.swing.JPanel {
         model.addColumn("JABATAN");
 
         String sql = """
-                        SELECT k.nik, k.nama_karyawan, k.notelp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
+                        SELECT k.nik, k.nama_karyawan, k.notlp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
                         INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
                         
                         ORDER BY K.CREATE_AT DESC
@@ -432,7 +437,7 @@ public class Tambah extends javax.swing.JPanel {
                 model.addRow(new Object[]{
                     rs.getString("nik"),
                     rs.getString("nama_karyawan"),
-                    rs.getString("notelp"),
+                    rs.getString("notlp"),
                     rs.getString("alamat"),
                     rs.getString("jenis_kelamin"),
                     rs.getString("divisi"),
@@ -450,12 +455,18 @@ public class Tambah extends javax.swing.JPanel {
 
     private void generated() {
         try {
-            String sql = "INSERT INTO TB_USER(USERNAME, PASSWORD) VALUES (?,?)";
+            String sql = "INSERT INTO TB_USER(ROLE_ID,USERNAME, PASSWORD,CREATE_BY,CREATE_AT,RECORD_FLAG) VALUES (?,?,?,?,?,?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, nikKar.getText());
-            ps.setString(2, generatedPass());
-
+            ps.setInt(1,1);
+            ps.setString(2, namaKar.getText());
+            ps.setString(3, generatedPass());
+            ps.setString(4, "admin");
+            java.util.Date utilDate = new java.util.Date();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            ps.setDate(5, sqlDate);
+            ps.setString(6, Constants.RECORD_FLAG_N);
+            
             ps.executeUpdate();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Tidak bisa terhubung");
