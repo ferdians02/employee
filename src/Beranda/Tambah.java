@@ -7,9 +7,10 @@ import java.sql.ResultSet;
 import java.sql.Date;
 
 import constant.Constants;
- 
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import util.ValidateUtil;
 
 /**
  *
@@ -28,7 +29,7 @@ public class Tambah extends javax.swing.JPanel {
         comboDivBox();
         comboJabatanBox();
         comboJenisKelaminBox();
-
+        loadData();
     }
 
     /**
@@ -42,10 +43,10 @@ public class Tambah extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        cari = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblKar = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         nikKar = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -88,7 +89,7 @@ public class Tambah extends javax.swing.JPanel {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblKar.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -99,7 +100,7 @@ public class Tambah extends javax.swing.JPanel {
                 "Id karyawan", "Nama", "No Telepon", "Alamat", "Jenis Kelamin", "Divisi", "Jabatan"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblKar);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -214,7 +215,7 @@ public class Tambah extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(cari, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -258,7 +259,7 @@ public class Tambah extends javax.swing.JPanel {
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cari, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -303,7 +304,49 @@ public class Tambah extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel model = new DefaultTableModel();
+
+        model.addColumn("NIK");
+        model.addColumn("NAMA KARYAWAN");
+        model.addColumn("NO HANDPHONE");
+        model.addColumn("ALAMAT");
+        model.addColumn("JENIS KELAMIN");
+        model.addColumn("DIVISI");
+        model.addColumn("JABATAN");
+
+        String sql = """
+                        SELECT k.nik, k.nama_karyawan, k.notelp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
+                        INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
+                        WHERE  upper(k.nama_karyawan) like upper(?)
+                     
+                        ORDER BY K.CREATE_AT DESC
+                     """;
+        
+        System.out.println("Keyword : " + cari.getText());
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "%" + cari.getText() + "%");
+           
+         
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("nik"),
+                    rs.getString("nama_karyawan"),
+                    rs.getString("notelp"),
+                    rs.getString("alamat"),
+                    rs.getString("jenis_kelamin"),
+                    rs.getString("divisi"),
+                    rs.getString("nama_jabatan")});
+            }
+
+            tblKar.setModel(model);
+
+        } catch (Exception e) {
+
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void namaKarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_namaKarActionPerformed
@@ -343,16 +386,20 @@ public class Tambah extends javax.swing.JPanel {
             ps.setString(6, nohp);
             ps.setString(7, alamat);
             ps.setString(8, "Admin");
-            
+
             java.util.Date utilDate = new java.util.Date();
             java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-            ps.setDate(9,  sqlDate);
+            ps.setDate(9, sqlDate);
             ps.setString(10, Constants.RECORD_FLAG_N);
 
+            ValidateUtil.validationKaryawan(nik, namaKaryawan, nohp, alamat, divisi, namaJabatan, jk);
+
+            generated();
             ps.executeUpdate();
-            
-            JOptionPane.showConfirmDialog(null, "Data berhasil di buat");
-            
+
+            loadData();
+            JOptionPane.showMessageDialog(null, "Data berhasil di buat");
+
             clear();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Tidak terhubung" + e.getMessage());
@@ -360,16 +407,80 @@ public class Tambah extends javax.swing.JPanel {
 
     }//GEN-LAST:event_addKaryawanActionPerformed
 
-    private void clear(){
-        nik = "";
-        namaKaryawan = "";
-        nohp = "";
-        alamat = "";
-        divisi = "";
-        namaJabatan = "";
-        jk = "";
+    private void loadData() {
+        DefaultTableModel model = new DefaultTableModel();
+
+        model.addColumn("NIK");
+        model.addColumn("NAMA KARYAWAN");
+        model.addColumn("NO HANDPHONE");
+        model.addColumn("ALAMAT");
+        model.addColumn("JENIS KELAMIN");
+        model.addColumn("DIVISI");
+        model.addColumn("JABATAN");
+
+        String sql = """
+                        SELECT k.nik, k.nama_karyawan, k.notelp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
+                        INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
+                        
+                        ORDER BY K.CREATE_AT DESC
+                     """;
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("nik"),
+                    rs.getString("nama_karyawan"),
+                    rs.getString("notelp"),
+                    rs.getString("alamat"),
+                    rs.getString("jenis_kelamin"),
+                    rs.getString("divisi"),
+                    rs.getString("nama_jabatan")
+                });
+            }
+
+            tblKar.setModel(model);
+
+        } catch (Exception e) {
+
+        }
     }
- 
+//    GENERATE  PASSWORD
+
+    private void generated() {
+        try {
+            String sql = "INSERT INTO TB_USER(USERNAME, PASSWORD) VALUES (?,?)";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, nikKar.getText());
+            ps.setString(2, generatedPass());
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Tidak bisa terhubung");
+        }
+    }
+
+    private String generatedPass() {
+
+        String nama = namaKar.getText();
+        Integer random = (int) Math.random() * 100;
+        String value = nama.toLowerCase() + random;
+
+        return value;
+    }
+
+    private void clear() {
+        nikKar.setText("");
+        namaKar.setText("");
+        no.setText("");
+        almt.setText("");
+        divsi.setSelectedItem(false);
+        jbtn.setSelectedItem(false);
+        jenis.setSelectedItem(false);
+    }
+
 //    COMBO BOX
     private String comboDivBox() {
         divsi.addItem("IT");
@@ -382,18 +493,16 @@ public class Tambah extends javax.swing.JPanel {
 
         return val;
     }
-    
-     private String comboJenisKelaminBox() {
-         jenis.removeAllItems();
+
+    private String comboJenisKelaminBox() {
+        jenis.removeAllItems();
         jenis.addItem("Laki - laki");
         jenis.addItem("Perempuan");
-       
+
         String val = jenis.getSelectedItem().toString();
 
         return val;
     }
-    
-    
 
     private void comboJabatanBox() {
         try {
@@ -405,8 +514,6 @@ public class Tambah extends javax.swing.JPanel {
                 jbtn.addItem("Pilih");
                 jbtn.addItem(rs.getString("NAMA_JABATAN"));
             }
-
-//            conn.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
         }
@@ -420,11 +527,11 @@ public class Tambah extends javax.swing.JPanel {
             PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
             ps.setString(1, valJbtn);
             ResultSet rs = ps.executeQuery();
-            
-            while(rs.next()){
+
+            while (rs.next()) {
                 find = rs.getInt("ID_JABATAN");
             }
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
         }
@@ -442,6 +549,7 @@ public class Tambah extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addKaryawan;
     private javax.swing.JTextArea almt;
+    private javax.swing.JTextField cari;
     private javax.swing.JComboBox<String> divsi;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -458,12 +566,11 @@ public class Tambah extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JComboBox<String> jbtn;
     private javax.swing.JComboBox<String> jenis;
     private javax.swing.JTextField namaKar;
     private javax.swing.JTextField nikKar;
     private javax.swing.JTextField no;
+    private javax.swing.JTable tblKar;
     // End of variables declaration//GEN-END:variables
 }
