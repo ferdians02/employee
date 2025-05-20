@@ -411,6 +411,8 @@ public class Tambah extends javax.swing.JPanel {
         divisi = divsi.getSelectedItem().toString();
         namaJabatan = jbtn.getSelectedItem().toString();
         jk = jenis.getSelectedItem().toString();
+        
+        System.out.println("INI ADALAH NAMA JABATAN : " + namaJabatan);
 
         String sql = """
                         INSERT INTO TB_KARYAWAN(ID_JABATAN, NAMA_KARYAWAN, DIVISI, JENIS_KELAMIN, NIK, NOTLP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
@@ -435,7 +437,7 @@ public class Tambah extends javax.swing.JPanel {
 
             ValidateUtil.validationKaryawan(nik, namaKaryawan, nohp, alamat, divisi, namaJabatan, jk);
 
-            generated();
+            generated(namaJabatan);
             ps.executeUpdate();
 
             loadData();
@@ -524,13 +526,22 @@ public class Tambah extends javax.swing.JPanel {
     }
 //    GENERATE  PASSWORD
 
-    private void generated() {
+    private void generated(String jabatan) {
         try {
-            String sql = "INSERT INTO TB_USER(ROLE_ID,USERNAME, PASSWORD,CREATE_BY,CREATE_AT,RECORD_FLAG) VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO TB_USER(ROLE_ID, USERNAME, PASSWORD,CREATE_BY,CREATE_AT,RECORD_FLAG) VALUES (?,?,?,?,?,?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, 1);
-            ps.setString(2, namaKar.getText());
+            
+            int valJabatan = findJabatanName(jabatan);
+            String namaJabatan = getJabatan(jabatan);
+            
+      
+            if(namaJabatan.equals("MANAGER") || namaJabatan.equals("STAFF IT") || namaJabatan.equals("HRD")){
+                ps.setInt(1, 1);
+            } else {
+                ps.setInt(1, 2);
+            }
+            ps.setString(2, nikKar.getText());
             ps.setString(3, generatedPass());
             ps.setString(4, "admin");
             java.util.Date utilDate = new java.util.Date();
@@ -591,14 +602,34 @@ public class Tambah extends javax.swing.JPanel {
             String sql = "SELECT NAMA_JABATAN FROM TB_JABATAN";
             PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
+            
+            jbtn.removeAllItems();
+            jbtn.addItem("Pilih");
             while (rs.next()) {
-                jbtn.removeAllItems();
-                jbtn.addItem("Pilih");
                 jbtn.addItem(rs.getString("NAMA_JABATAN"));
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
         }
+    }
+    
+    private String getJabatan(String jabatan){
+        String val = "";
+        try{
+            String sql = "SELECT NAMA_JABATAN FROM TB_JABATAN WHERE NAMA_JABATAN = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, jabatan);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next()){
+                val = rs.getString("NAMA_JABATAN");
+            }
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Tidak terhubung ke " + e.getMessage());
+        }
+        
+        return val;
     }
 
 //    FIND DATA
