@@ -415,14 +415,14 @@ public class Tambah extends javax.swing.JPanel {
         System.out.println("INI ADALAH NAMA JABATAN : " + namaJabatan);
 
         String sql = """
-                        INSERT INTO TB_KARYAWAN(ID_JABATAN, NAMA_KARYAWAN, DIVISI, JENIS_KELAMIN, NIK, NOTLP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
+                        INSERT INTO TB_KARYAWAN(ID_JABATAN,
+                     NAMA_KARYAWAN, 
+                     DIVISI, JENIS_KELAMIN, NIK, NOTLP, ALAMAT, CREATE_BY, CREATE_AT, RECORD_FLAG) 
                        VALUES(?,?,?,?,?,?,?,?,?,?)
                        """;
-
         try {
             PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
             ps.setInt(1, findJabatanName(namaJabatan));
-
             ps.setString(2, namaKaryawan);
             ps.setString(3, divisi);
             ps.setString(4, jk);
@@ -444,9 +444,10 @@ public class Tambah extends javax.swing.JPanel {
                 ValidateUtil.validationKaryawan(nik, namaKaryawan, nohp, alamat, divisi, namaJabatan, jk);
 
                 generated(namaJabatan);
-                ps.executeUpdate();
-                loadData();
+
             }
+            ps.executeUpdate();
+            loadData();
 
             JOptionPane.showMessageDialog(null, "Data berhasil di buat");
 
@@ -529,8 +530,8 @@ public class Tambah extends javax.swing.JPanel {
 
         }
     }
+    
 //    GENERATE  PASSWORD
-
     private void generated(String jabatan) {
         try {
             String sql = "INSERT INTO TB_USER(ROLE_ID, USERNAME, PASSWORD,CREATE_BY,CREATE_AT,RECORD_FLAG) VALUES (?,?,?,?,?,?)";
@@ -545,7 +546,6 @@ public class Tambah extends javax.swing.JPanel {
             } else {
                 ps.setInt(1, 2);
             }
-
             ps.setString(2, nikKar.getText());
             ps.setString(3, generatedPass());
             ps.setString(4, "admin");
@@ -553,10 +553,10 @@ public class Tambah extends javax.swing.JPanel {
             java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
             ps.setDate(5, sqlDate);
             ps.setString(6, Constants.RECORD_FLAG_N);
-
             ps.executeUpdate();
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Tidak bisa terhubung");
+            JOptionPane.showMessageDialog(null, "Tidak bisa terhubung ke user : " + e.getMessage());
         }
     }
 
@@ -636,6 +636,26 @@ public class Tambah extends javax.swing.JPanel {
         }
 
         return val;
+    }
+
+    private Integer countKaryawan() {
+        Integer count = null;
+        try {
+            String checkNikSql = "SELECT COUNT(*) FROM TB_USER WHERE USERNAME = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkNikSql);
+            checkStmt.setString(1, nikKar.getText());
+            ResultSet rs = checkStmt.executeQuery();
+            
+            if(rs.next()){
+                count = rs.getInt("COUNT");
+            }
+            
+            checkStmt.execute();
+            
+        } catch (Exception e) {
+          JOptionPane.showMessageDialog(null, "");
+        }
+        return count;
     }
 
 //    FIND DATA
