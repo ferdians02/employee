@@ -100,6 +100,11 @@ public class Tambah extends javax.swing.JPanel {
                 "Id karyawan", "Nama", "No Telepon", "Alamat", "Jenis Kelamin", "Divisi", "Jabatan"
             }
         ));
+        tblKar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblKarMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblKar);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
@@ -322,17 +327,14 @@ public class Tambah extends javax.swing.JPanel {
         String sql = """
                         SELECT k.nik, k.nama_karyawan, k.notlp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
                         INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
-                        WHERE  upper(k.nama_karyawan) like upper(?)
-                     
+                        WHERE K.RECORD_FLAG <> 'D' AND upper(k.nama_karyawan) like upper(?) 
                         ORDER BY K.CREATE_AT DESC
                      """;
-        
+
         System.out.println("Keyword : " + cari.getText());
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + cari.getText() + "%");
-           
-         
 
             ResultSet rs = ps.executeQuery();
 
@@ -364,6 +366,40 @@ public class Tambah extends javax.swing.JPanel {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
+        namaKaryawan = namaKar.getText();
+        nohp = no.getText();
+        alamat = almt.getText();
+        divisi = divsi.getSelectedItem().toString();
+        namaJabatan = jbtn.getSelectedItem().toString();
+        jk = jenis.getSelectedItem().toString();
+        nik = nikKar.getText();
+
+        try {
+
+           
+             String sql = """
+                        UPDATE TB_KARYAWAN
+                        SET 
+                         UPDATE_BY = ?, 
+                         UPDATE_AT = ?, 
+                         RECORD_FLAG = ?
+                        WHERE NIK = ?
+                     """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "admin");
+            java.util.Date utilDate = new java.util.Date();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            ps.setDate(2, sqlDate);
+            ps.setString(3, Constants.RECORD_FLAG_D);
+            ps.setString(4, nik);
+            
+            ps.execute();   
+            loadData();
+            JOptionPane.showMessageDialog(null, "Data berhasil diupdate");
+        } catch (Exception e) {
+           JOptionPane.showMessageDialog(null, "Tidak bisa terhubung " + e.getMessage());
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void addKaryawanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addKaryawanActionPerformed
@@ -411,7 +447,42 @@ public class Tambah extends javax.swing.JPanel {
         }
 
     }//GEN-LAST:event_addKaryawanActionPerformed
+    
+    private void loadTbleClick() {
+        try {
+             String sql = """
+                        SELECT k.nik, k.nama_karyawan, k.notlp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
+                        INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
+                        WHERE k.nik = ?
+                        ORDER BY K.CREATE_AT DESC
+                     """;
+             
+            int row = tblKar.getSelectedRow();
+            String clickTable = (tblKar.getModel().getValueAt(row, 0).toString());
+           
 
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, clickTable);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                nikKar.setText(rs.getString("nik"));
+                nikKar.setEnabled(false);
+                
+                namaKar.setText(rs.getString("nama_karyawan"));
+                no.setText(rs.getString("notlp"));
+                almt.setText(rs.getString("alamat"));
+                jenis.setSelectedItem(rs.getString("jenis_kelamin"));
+                divsi.setSelectedItem(rs.getString("divisi"));
+                jbtn.setSelectedItem(rs.getString("nama_jabatan"));
+            }
+
+         
+        } catch (Exception e) {
+
+        }
+    }
+    
     private void loadData() {
         DefaultTableModel model = new DefaultTableModel();
 
@@ -426,7 +497,7 @@ public class Tambah extends javax.swing.JPanel {
         String sql = """
                         SELECT k.nik, k.nama_karyawan, k.notlp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
                         INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
-                        
+                        WHERE  K.RECORD_FLAG <> 'D'
                         ORDER BY K.CREATE_AT DESC
                      """;
         try {
@@ -458,7 +529,7 @@ public class Tambah extends javax.swing.JPanel {
             String sql = "INSERT INTO TB_USER(ROLE_ID,USERNAME, PASSWORD,CREATE_BY,CREATE_AT,RECORD_FLAG) VALUES (?,?,?,?,?,?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1,1);
+            ps.setInt(1, 1);
             ps.setString(2, namaKar.getText());
             ps.setString(3, generatedPass());
             ps.setString(4, "admin");
@@ -466,7 +537,7 @@ public class Tambah extends javax.swing.JPanel {
             java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
             ps.setDate(5, sqlDate);
             ps.setString(6, Constants.RECORD_FLAG_N);
-            
+
             ps.executeUpdate();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Tidak bisa terhubung");
@@ -555,6 +626,12 @@ public class Tambah extends javax.swing.JPanel {
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void tblKarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblKarMouseClicked
+        // TODO add your handling code here:
+        
+        loadTbleClick();
+    }//GEN-LAST:event_tblKarMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
