@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Date;
 
 import constant.Constants;
+import java.util.Random;
 
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -562,8 +563,9 @@ public class Tambah extends javax.swing.JPanel {
     private String generatedPass() {
 
         String nama = namaKar.getText();
-        Integer random = (int) Math.random() * 100;
-        String value = nama.toLowerCase() + random;
+        Random random = new Random();
+        int intRandom = random.nextInt(12);
+        String value = nama.toLowerCase() + intRandom;
 
         return value;
     }
