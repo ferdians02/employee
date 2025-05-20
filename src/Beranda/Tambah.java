@@ -376,8 +376,7 @@ public class Tambah extends javax.swing.JPanel {
 
         try {
 
-           
-             String sql = """
+            String sql = """
                         UPDATE TB_KARYAWAN
                         SET 
                          UPDATE_BY = ?, 
@@ -393,12 +392,12 @@ public class Tambah extends javax.swing.JPanel {
             ps.setDate(2, sqlDate);
             ps.setString(3, Constants.RECORD_FLAG_D);
             ps.setString(4, nik);
-            
-            ps.execute();   
+
+            ps.execute();
             loadData();
             JOptionPane.showMessageDialog(null, "Data berhasil diupdate");
         } catch (Exception e) {
-           JOptionPane.showMessageDialog(null, "Tidak bisa terhubung " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Tidak bisa terhubung " + e.getMessage());
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -411,7 +410,7 @@ public class Tambah extends javax.swing.JPanel {
         divisi = divsi.getSelectedItem().toString();
         namaJabatan = jbtn.getSelectedItem().toString();
         jk = jenis.getSelectedItem().toString();
-        
+
         System.out.println("INI ADALAH NAMA JABATAN : " + namaJabatan);
 
         String sql = """
@@ -422,34 +421,32 @@ public class Tambah extends javax.swing.JPanel {
         try {
             PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
             ps.setInt(1, findJabatanName(namaJabatan));
-            
-           
+
             ps.setString(2, namaKaryawan);
             ps.setString(3, divisi);
             ps.setString(4, jk);
-           
+
             String empNik = getEmployeeNumber(nik);
-            if(empNik.equals(nik)){
+            if (empNik.equals(nik)) {
                 JOptionPane.showMessageDialog(null, "NIK sudah ada");
-            } else{
-                 ps.setString(5, nik);
+            } else {
+                ps.setString(5, nik);
+                ps.setString(6, nohp);
+                ps.setString(7, alamat);
+                ps.setString(8, "Admin");
+
+                java.util.Date utilDate = new java.util.Date();
+                java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+                ps.setDate(9, sqlDate);
+                ps.setString(10, Constants.RECORD_FLAG_N);
+
+                ValidateUtil.validationKaryawan(nik, namaKaryawan, nohp, alamat, divisi, namaJabatan, jk);
+
+                generated(namaJabatan);
+                ps.executeUpdate();
+                loadData();
             }
-          
-            ps.setString(6, nohp);
-            ps.setString(7, alamat);
-            ps.setString(8, "Admin");
 
-            java.util.Date utilDate = new java.util.Date();
-            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-            ps.setDate(9, sqlDate);
-            ps.setString(10, Constants.RECORD_FLAG_N);
-
-            ValidateUtil.validationKaryawan(nik, namaKaryawan, nohp, alamat, divisi, namaJabatan, jk);
-
-            generated(namaJabatan);
-            ps.executeUpdate();
-
-            loadData();
             JOptionPane.showMessageDialog(null, "Data berhasil di buat");
 
             clear();
@@ -458,28 +455,27 @@ public class Tambah extends javax.swing.JPanel {
         }
 
     }//GEN-LAST:event_addKaryawanActionPerformed
-    
+
     private void loadTbleClick() {
         try {
-             String sql = """
+            String sql = """
                         SELECT k.nik, k.nama_karyawan, k.notlp, k.alamat, k.jenis_kelamin, k.divisi, j.nama_jabatan FROM TB_KARYAWAN k
                         INNER JOIN TB_JABATAN J ON K.ID_JABATAN = J.ID_JABATAN
                         WHERE k.nik = ?
                         ORDER BY K.CREATE_AT DESC
                      """;
-             
+
             int row = tblKar.getSelectedRow();
             String clickTable = (tblKar.getModel().getValueAt(row, 0).toString());
-           
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, clickTable);
             ResultSet rs = ps.executeQuery();
 
-            if(rs.next()){
+            if (rs.next()) {
                 nikKar.setText(rs.getString("nik"));
                 nikKar.setEnabled(false);
-                
+
                 namaKar.setText(rs.getString("nama_karyawan"));
                 no.setText(rs.getString("notlp"));
                 almt.setText(rs.getString("alamat"));
@@ -488,12 +484,11 @@ public class Tambah extends javax.swing.JPanel {
                 jbtn.setSelectedItem(rs.getString("nama_jabatan"));
             }
 
-         
         } catch (Exception e) {
 
         }
     }
-    
+
     private void loadData() {
         DefaultTableModel model = new DefaultTableModel();
 
@@ -540,18 +535,16 @@ public class Tambah extends javax.swing.JPanel {
             String sql = "INSERT INTO TB_USER(ROLE_ID, USERNAME, PASSWORD,CREATE_BY,CREATE_AT,RECORD_FLAG) VALUES (?,?,?,?,?,?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-            
+
             int valJabatan = findJabatanName(jabatan);
             String namaJabatan = getJabatan(jabatan);
-            
-      
-            if(namaJabatan.equals("MANAGER") || namaJabatan.equals("STAFF IT") || namaJabatan.equals("HRD")){
+
+            if (namaJabatan.equals("MANAGER") || namaJabatan.equals("STAFF IT") || namaJabatan.equals("HRD")) {
                 ps.setInt(1, 1);
             } else {
                 ps.setInt(1, 2);
             }
-            
-          
+
             ps.setString(2, nikKar.getText());
             ps.setString(3, generatedPass());
             ps.setString(4, "admin");
@@ -613,7 +606,7 @@ public class Tambah extends javax.swing.JPanel {
             String sql = "SELECT NAMA_JABATAN FROM TB_JABATAN";
             PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            
+
             jbtn.removeAllItems();
             jbtn.addItem("Pilih");
             while (rs.next()) {
@@ -623,23 +616,23 @@ public class Tambah extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
         }
     }
-    
-    private String getJabatan(String jabatan){
+
+    private String getJabatan(String jabatan) {
         String val = "";
-        try{
+        try {
             String sql = "SELECT NAMA_JABATAN FROM TB_JABATAN WHERE NAMA_JABATAN = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, jabatan);
-            
+
             ResultSet rs = ps.executeQuery();
-            
-            if(rs.next()){
+
+            if (rs.next()) {
                 val = rs.getString("NAMA_JABATAN");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Tidak terhubung ke " + e.getMessage());
         }
-        
+
         return val;
     }
 
@@ -661,19 +654,19 @@ public class Tambah extends javax.swing.JPanel {
         }
         return find;
     }
-    
-    private String getEmployeeNumber(String number){
+
+    private String getEmployeeNumber(String number) {
         String sql = "SELECT NIK FROM TB_KARYAWAN WHERE NIK = ?";
         String val = "";
-        try{
+        try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, number);
-            
+
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 val = rs.getString("NIK");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Tidak dapat terhubung ke database " + e.getMessage());
         }
         return val;
@@ -688,7 +681,7 @@ public class Tambah extends javax.swing.JPanel {
 
     private void tblKarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblKarMouseClicked
         // TODO add your handling code here:
-        
+
         loadTbleClick();
     }//GEN-LAST:event_tblKarMouseClicked
 
