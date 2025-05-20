@@ -422,10 +422,19 @@ public class Tambah extends javax.swing.JPanel {
         try {
             PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
             ps.setInt(1, findJabatanName(namaJabatan));
+            
+           
             ps.setString(2, namaKaryawan);
             ps.setString(3, divisi);
             ps.setString(4, jk);
-            ps.setString(5, nik);
+           
+            String empNik = getEmployeeNumber(nik);
+            if(empNik.equals(nik)){
+                JOptionPane.showMessageDialog(null, "NIK sudah ada");
+            } else{
+                 ps.setString(5, nik);
+            }
+          
             ps.setString(6, nohp);
             ps.setString(7, alamat);
             ps.setString(8, "Admin");
@@ -541,6 +550,8 @@ public class Tambah extends javax.swing.JPanel {
             } else {
                 ps.setInt(1, 2);
             }
+            
+          
             ps.setString(2, nikKar.getText());
             ps.setString(3, generatedPass());
             ps.setString(4, "admin");
@@ -649,6 +660,23 @@ public class Tambah extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Data jabatan tidak ditemukan");
         }
         return find;
+    }
+    
+    private String getEmployeeNumber(String number){
+        String sql = "SELECT NIK FROM TB_KARYAWAN WHERE NIK = ?";
+        String val = "";
+        try{
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, number);
+            
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                val = rs.getString("NIK");
+            }
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Tidak dapat terhubung ke database " + e.getMessage());
+        }
+        return val;
     }
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
